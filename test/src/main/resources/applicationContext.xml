@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="       
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd       
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd       
+      http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd       
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd       
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<context:annotation-config />
+	<context:component-scan base-package="com.menu.*" >
+		<context:include-filter type="regex" expression="com\.menu.*\.services\.*"/>
+		<context:include-filter type="regex" expression="com\.menu\.*\.action\.*"/>
+	</context:component-scan>
+	<context:component-scan base-package="com.tzsw.*" >
+		<context:include-filter type="regex" expression="com\.tzsw\.*\.services\.*"/>
+		<context:include-filter type="regex" expression="com\.tzsw\.*\.action\.*"/>
+	</context:component-scan>
+	<tx:annotation-driven />
+
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		
+		<property name="url" value="jdbc:oracle:thin:@10.85.8.10:1521:orcl"></property>
+		
+		<property name="url" value="jdbc:oracle:thin:@192.2.2.140:1521:orcl"></property>
+		<property name="username" value="qzygzw_user" />
+		<property name="password" value="oracle" />
+		<property name="maxActive" value="100" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="30000" />
+	</bean> -->
+	
+	<bean id="dataSource"class="org.apache.commons.dbcp.BasicDataSource">
+         <property name="driverClassName"value="sun.jdbc.odbc.JdbcOdbcDriver"></property>
+         <property name="url" value="jdbc:odbc:driver={Microsoft Access Driver (*.mdb)};DBQ=db.mdb"></property>
+         <property name="username" value=""></property>
+         <property name="password" value=""></property>
+         <property name="maxActive" value="100"></property>
+         <property name="maxIdle"  value="30"></property>
+         <property name="maxWait" value="500"></property>
+         <property name="defaultAutoCommit" value="true"></property>
+    </bean>
+
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"> 
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" 
+		/> <property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl"></property> 
+		<property name="username" value="ygzw_yw" /> <property name="password" value="oracle" 
+		/> <property name="maxActive" value="100" /> <property name="maxIdle" value="30" 
+		/> <property name="maxWait" value="30000" /> </bean> -->
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 配置事务的传播特性 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="edit*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 那些类的哪些方法参与事务 -->
+	<aop:config>
+		<aop:pointcut id="allManagerMethod" expression="execution(* com..services..*.*(..))" />
+		<aop:advisor pointcut-ref="allManagerMethod" advice-ref="txAdvice" />
+	</aop:config>
+
+	<bean id="oftenfunMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="mapperInterface" value="com.tzsw.newapps.common.dao.IOftenfunMapper" />
+	</bean>
+	<!-- activiti配置开始 -->
+	<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+		<property name="dataSource" ref="dataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="databaseSchemaUpdate" value="true" />
+		<property name="mailServerHost" value="localhost" />
+		<property name="mailServerPort" value="5025" />
+		<property name="jpaHandleTransaction" value="true" />
+		<property name="jpaCloseEntityManager" value="true" />
+		<property name="jobExecutorActivate" value="false" />
+		<property name="history" value="full"></property>
+	</bean>
+
+	<bean id="aa12Mapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="mapperInterface" value="com.tzsw.newapps.common.dao.IAa12Mapper" />
+	</bean>
+
+	<!-- 定义流程引擎 -->
+	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
+	</bean>
+
+	<bean id="repositoryService" factory-bean="processEngine"
+		factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine"
+		factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine"
+		factory-method="getTaskService" />
+	<bean id="formService" factory-bean="processEngine"
+		factory-method="getFormService" />
+	<bean id="historyService" factory-bean="processEngine"
+		factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine"
+		factory-method="getManagementService" />
+	<bean id="identityService" factory-bean="processEngine"
+		factory-method="getIdentityService" />
+	<!-- activiti配置结束 -->
+
+	<!-- 可视化流程图 -->
+	<bean id="loadTimeWeaver"
+		class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver">
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml" />
+		<property name="persistenceUnitName" value="com.activiti.jpa" />
+		<property name="loadTimeWeaver" ref="loadTimeWeaver" />
+	</bean>
+
+</beans>

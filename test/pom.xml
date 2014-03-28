@@ -19,7 +19,16 @@
     	<artifactId>servlet-api</artifactId>
     	<version>5.5.23</version>
 	</dependency>
-	
+	<dependency>
+    	<groupId>spring</groupId>
+    	<artifactId>spring</artifactId>
+    	<version>1.0.2</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-dbcp2</artifactId>
+		<version>2.0</version>
+	</dependency>
   </dependencies>
   <build>
     <finalName>test</finalName>
