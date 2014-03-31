@@ -1,4 +1,4 @@
-package fyyxz;
+package fyyxz.proxy;
 
 public class RealPassenger implements Passenger {
 
