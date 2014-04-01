@@ -11,11 +11,11 @@
       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd       
       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 	<context:annotation-config />
-	<context:component-scan base-package="com.menu.*" >
+	<context:component-scan base-package="com.*.*" >
 		<context:include-filter type="regex" expression="com\.menu.*\.services\.*"/>
 		<context:include-filter type="regex" expression="com\.menu\.*\.action\.*"/>
 	</context:component-scan>
-	<context:component-scan base-package="com.tzsw.*" >
+	<context:component-scan base-package="com.*.*" >
 		<context:include-filter type="regex" expression="com\.tzsw\.*\.services\.*"/>
 		<context:include-filter type="regex" expression="com\.tzsw\.*\.action\.*"/>
 	</context:component-scan>
