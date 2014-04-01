@@ -1,4 +1,4 @@
-package fyyxz.thread;
+package com.fyyxz.thread;
 
 public class JustRun {
 	

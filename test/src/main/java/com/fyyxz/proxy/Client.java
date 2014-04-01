@@ -1,4 +1,4 @@
-package fyyxz.proxy;
+package com.fyyxz.proxy;
 
 public class Client {
 	public static void main(String[] args) {

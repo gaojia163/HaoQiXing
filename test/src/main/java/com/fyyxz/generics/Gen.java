@@ -1,4 +1,4 @@
-package fyyxz.generics;
+package com.fyyxz.generics;
 
 class Gen<T> {
 	

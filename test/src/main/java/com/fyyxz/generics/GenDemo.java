@@ -1,4 +1,4 @@
-package fyyxz.generics;
+package com.fyyxz.generics;
 
 import java.util.ArrayList;
 import java.util.List;
